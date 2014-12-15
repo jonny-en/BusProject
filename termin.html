@@ -8,6 +8,7 @@
 	<link rel="stylesheet" type="text/css" href="css/headers.css"/>
 	<link rel="stylesheet" type="text/css" href="css/lists.css"/>
 	<link rel="stylesheet" type="text/css" href="css/buttons.css"/>
+	<link rel="stylesheet" type="text/css" href="css/tabs.css">
 	<link rel="stylesheet" type="text/css" href="css/termin.css"/>
 	<link rel="stylesheet" type="text/css" href="css/gaia-icons-embedded.css"/>
 
@@ -17,9 +18,7 @@
 <body role="application">
 	<section role="region">
 		<header>
-			<button id="back"><span class="icon icon-back">back</span></button>
 			<menu type="toolbar">
-				<button id="settings"><span data-icon="settings"></span></button>
 			</menu>
 			<h1>Date</h1>
 		</header>
@@ -38,7 +37,25 @@
 		<div id="confirmbutton">
 			<p><button>Confirm</button></p>
 		</div>
+		</article>
+	
 	</section>
+		<div id="navigation">
+			<ul role="tablist" class="bb-tablist skin-dark">
+     			<li id="panel1" role="presentation">
+        			<a id="tab1" href="#" role="tab" aria-controls="tabpanel1" aria-selected="false" data-icon="undo">Back</a>
+        			<div id="tabpanel1" class="bb-tabpanel" role="tabpanel" aria-labelledby="tab1"></div>
+      			</li>
+      			<li id="panel2" role="presentation">
+        			<a id="tab2" href="index.html" role="tab" aria-controls="tabpanel2" aria-selected="false">Map</a>
+       		 		<div id="tabpanel2" class="bb-tabpanel" role="tabpanel" aria-labelledby="tab2"></div>
+      			</li>
+      			<li id="panel3" role="presentation">
+        			<a id="tabDate" href="termin.html" role="tab" aria-controls="tabpanel3" aria-selected="true">Date</a>
+       		 		<div id="tabpanel3" class="bb-tabpanel" role="tabpanel" aria-labelledby="tab3"></div>
+      			</li>
+    		</ul>
+		</div>
 	
 </body>
 </html>

@@ -21,18 +21,6 @@ section[role="region"] {
 	background: #fff;
 }
 
-#clock {
-	padding:10px;
-	border: 1px solid #000000;
-}
-
-#confirmbutton {
-	position: absolute;
-	bottom: 2px;
-	left: 10px;
-	right: 10px;
-}
-
 
 h1 {
   margin: 0 0 1rem 0;
