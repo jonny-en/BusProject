@@ -1,0 +1,78 @@
+NOTES
+
+Datenmodell der Dateien im LocalStorage
+(HS=Haltestelle, D=Ablaufdatum(Date.toDateString), T=Zeit, {Long/Lat}=Coordinaten, []=Array, {}=Object )
+
+Route: [
+		{name=Routennummer1 (für jeweiligen Abschnitt),
+		stops=[	{name=HS1,
+				coordinates= [{Long/Lat},...]},
+				{name=HS2,
+				coordinates= [{Long/Lat},...]}],
+		times=[T1,T2]},
+		{name=Routennummer2,
+		stops=[	{name=HS2,
+				coordinates= [{Long/Lat},...]},
+				{name=HS3,
+				coordinates= [{Long/Lat},...]}],
+		times=[T3,T4]},
+		...
+	   ]
+
+OverpassRouten -> 	[
+						{
+						town=Stadtname,
+						date= D1;
+						elements=[Relationen in Rohform wie direkt von Overpass (zum bearbeiten: JSON.parse(...)) ]
+						},
+						....
+					]
+
+OverpassStops -> analog (nur Nodes und Ways statt Relation)
+
+Test: 
+	Browser: öffne busMappingTest.html -> Gib Start und Ziel ein -> Laden -> Siehe Console/localStorage (richtige Output gestrichen damit man Fkt besser verwenden kann) (Firefox (und Firefox OS) kann localStorage nicht nativ im Browser(F12) löschen(Chrome schon), daher -> Clear button)
+	Firefox OS(local storage nicht sichtbar): ändere Manifest: "launch_path": "/busMapTest.html", deploy, analog Browser
+
+Anmerkungen:
+
+- Parser im Moment auf möglichst geringe Netzwerkauslastung ausgelegt, Overpass Anfragen sind sehr langsam(kompliziert -> 20-30 sek) -> mehr Daten holen und dann lokal filtern => mehr Prozessorlast (aber immernoch schneller)
+- busMapping.js und stadtteile.js müssen immer eingebunden sein
+- Wenn busMapping auf anderer Seite verwendet werden soll: entferne document.getElementById(load) = ....
+- Date Format ist javascript Date (nichts externes)
+- getData(start,finish,null) gibt Route von aktuellem Zeitpunkt aus (also nächstmögliche)
+- keine Sicherheit das routenDaten geladen sind -> benutze processData() methode für Seitenwechsel/Weiterverarbeitung
+
+
+FERTIG (aber verbesserbar)
+
+- Parser in funktionsbereitem Zustand (Kurzfassung)
+- OVERPASS REQUESTS sind sehr langsam -> Return speichern und mit TownName versehen -> such in dieser Liste nach TownQuery (update 1 mal am Tag/?)
+- Wenn Fußweg -> placeholder (Dauer, placeholder) (beim auslesen beachten)
+- TownName finden optimieren - ganz gut, verbesserbar (genug)
+- StopName finden optimieren - ganz gut, verbesserbar (genug)
+- Suchfeldvorschläge die korrekt bei der Bahn angenommen werden -> wenn nicht Fehler - führt im moment zu einen output (ERROR Handler) -> klären (später)
+- Alles auf Firefox OS bringen (jQuery entfernt, da Probleme)
+- speichern/laden der OverpassData im LocalStorage -> mit Ablaufdatum versehen, damit nicht veraltete Daten vorliegen (veraltete Daten werden automatisch gelöscht)
+- Anfrage über Haltestellennamen möglich (Strings und Date (input für getData) -> DB -> Overpass -> Route in localstorage)
+- speichern der erzeugten JSON routen obj in localstorage 
+- Alle Routen und Bushaltestellen (pro Stadt) im localstorage
+
+TODO
+
+- neue EVM Haltestellennamen in OSM fixen
+- Sobald Zug genutzt wird zerlegt es die Koordinaten (Bahnhof: Koblenz-Güls -> alle Haltestellen mit Koblenz)
+- Welche Haltestelle für welche Route (im Moment alle möglichen Haltestellen zugeordnet) in welche Richtung (<- keine Ahnung wie)
+
+BEKANNTE PROBLEME
+
+- in Firefox OS kann ein unsecure Error bei bahn.css auftreten -> neu laden
+- manchmal liefert route0 keinen sauberen Wert (keine Ahnung warum) -> neu laden
+- nicht alle Haltestellen funktionieren (nicht direkt/schwierig map-bare (Löhr-Center -> Bahnhof Stadtmitte/Löhr-Center))
+- Bad Kreuznach etc (2 Wörter) klappen nocht nicht -> Code muss angepasst werden
+- wie mitteilen das Routendaten jetzt geladen sind? (Observer auf Variable -> wenn alle geladen sind, ändere Variable -> initiiere Seitenwechsel)
+
+(- localstorage könnte voll laufen wenn viele verschiedene Städte geladen werden (jedoch unwahrscheinlich))
+(- async Anfragen sauber syncen)
+(- sync Anfragen entfernen (zu async Anfragen machen), da sonst das Programm einfriert)
+(- Dauer nicht optimal (erste Anfrage 5-15 sek, wenn Stadt bekannt und somit Routen und Haltestellen schon im Speicher sehr viel schneller 2-4 sek) -> eigentlich tolerierbar)
