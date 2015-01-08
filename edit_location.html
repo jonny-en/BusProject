@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="css/tabs.css" />
+    <link rel="stylesheet" href="css/headers.css" />
+    <link rel="stylesheet" href="css/gaia-icons-embedded.css" />
+    <link rel="stylesheet" href="css/input_areas.css" />
+    <link rel="stylesheet" href="css/edit_location.css" />
+    
+    <script type="text/javascript" src="js/libs/jquery-1.11.2.min.js"></script>
+    <script type="text/javascript" src="js/edit_location.js"></script>
+   
+    
+    
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" lang="en"/>
+  </head>
+  <body>
+    <div class="view">
+      <div id="header">
+        <section class="skin-dark" role="region">
+         <header>
+          <a href="index.html"><span class="icon icon-back">back</span></a>
+          <h1>Ort bearbeiten</h1>
+        </header>
+       </section>
+      </div>
+      <div id="content">
+       <p>Name des Ortes</p>
+       <form>
+        <p>
+         <input type="text" placeholder="Namen eingeben"/>
+         <button type="reset">Clear</button>
+        </p>
+       </form>
+        <div id="icon"></div>
+        <div id="changeIconContainer">
+         <button id="changeIcon">Icon ändern</button>
+        </div>
+        <div id="busstops">
+         <fieldset>
+           <p>Zugehörige Haltestellen</p>
+           <div>
+            <legend class="action">UNI-Metternich</legend>
+            <a href="#"><div class="delete"><span></span></div></a>
+           </div>
+           <div>
+            <legend class="action">Winninger Straße</legend>
+            <a href="#"><div class="delete"><span></span></div></a>
+           </div>
+           <button>Haltestelle hinzufügen</button>
+        </fieldset>
+        </div>
+      </div>
+      <div id="navigation">
+			 <ul role="tablist" class="bb-tablist skin-dark">
+     	  <li id="panel1" role="presentation">
+         <a id="tab1" href="index.html" role="tab" aria-controls="tabpanel1" aria-selected="true" data-icon="undo">Back</a>
+         <div id="tabpanel1" class="bb-tabpanel" role="tabpanel" aria-labelledby="tab1"></div>
+      	</li>
+      	<li id="panel2" role="presentation">
+        	<a id="tab2" href="map.html" role="tab" aria-controls="tabpanel2" aria-selected="false">Map</a>
+       		<div id="tabpanel2" class="bb-tabpanel" role="tabpanel" aria-labelledby="tab2"></div>
+      	</li>
+      	<li id="panel3" role="presentation">
+         <a id="tabDate" href="termin.html" role="tab" aria-controls="tabpanel3">Date</a>
+       	 <div id="tabpanel3" class="bb-tabpanel" role="tabpanel" aria-labelledby="tab3" aria-selected="false"></div>
+      	</li>
+    	 </ul>
+		  </div>
+    </div>
+  </body>
+  
+</html>
