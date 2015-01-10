@@ -1,0 +1,147 @@
+html, body{
+	margin: 0;
+	padding: 0;
+	font-size: 10px;
+}
+
+body {
+	height: 100%;
+	display: block;
+	overflow: hidden;
+	background-color:#2C393B;
+}
+
+section[role="region"] > header{
+	background: -moz-linear-gradient(top, #2C393B,#1C2224,#1C2224);
+	}
+	
+.edit {
+	color:white;
+}
+
+section[role="region"] {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+
+#navigation {
+	position: absolute;
+	width: 100%;
+	height: 5%;
+	left: 0px;
+	bottom: 0px;
+	background-color: transparent;
+}
+
+#wrapperleft {
+	position:absolute;
+	top:10rem;
+	left:-1rem;
+    overflow:auto;
+    height:250px;
+	width:50%
+	
+}
+
+#wrapperright{
+	position:absolute;
+	top:10rem;
+	right:2rem;
+	overflow:auto;
+	height:250px;
+	width:50%;
+	}
+
+#start{
+	position:absolute;
+	left:3rem;
+	}
+	
+#ziel{
+	position:absolute;
+	right:6rem;
+	}
+	
+#left{
+	color:white;
+	font-size:10pt
+}
+#right{
+	color:white;
+	font-size:10pt
+}
+
+a:link {
+	text-decoration:none;
+	color:white;
+}
+a:active span{
+	color:green;
+}
+
+ul li span{
+color:white;
+}
+.list {
+	color:white;
+	font-size:20pt;
+}
+
+#left header span{
+	position:absolute;
+	left:3rem;
+}
+li{
+	list-style:none;
+	text-align:center;
+	margin-bottom:4rem;
+}
+#add {
+  position:absolute;
+  bottom: 45px;
+  height: 11%;
+  width: 100%;
+  background-color: rgba(95,155,10,0.8);
+  
+  text-align: center;
+  z-index: 2;
+}
+
+#add div {
+  display: inline-block;
+  height:5em;
+  width: 5em;
+  background-color: #5F9B0A;
+  border-radius: 100%;
+  
+}
+#add a {
+  position:absolute;
+  bottom: 0.63em;
+  right: 15.2em;
+  text-decoration: none;
+  color: white;
+  outline: 0;
+}
+
+#add a:hover {
+  color:  #2C393B;
+}
+
+#left {
+	display:block;
+	left:0;
+	float:left;
+ }
+
+#right {
+	display:block;
+	right:0;
+	float:right;
+}
+
+
+

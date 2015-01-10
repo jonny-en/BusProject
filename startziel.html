@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Wohin</title>
+        <meta name="viewport" content="width=device-width">
+        <link rel="stylesheet" type="text/css" href="css/headers.css"/>
+	      <link rel="stylesheet" type="text/css" href="css/lists.css"/>
+	      <link rel="stylesheet" type="text/css" href="css/buttons.css"/>
+		  <link rel="stylesheet" type="text/css" href="css/tabs.css">
+	      <link rel="stylesheet" type="text/css" href="css/startziel.css"/>
+	      <link rel="stylesheet" type="text/css" href="css/gaia-icons-embedded.css"/>
+
+        <script type="text/javascript" src="js/app.js"></script>
+
+    </head>
+    <body>
+ <body role="application">
+	<section role="region">
+		<header>
+			<menu type="toolbar">
+				<a href="edit_location.html"> <span class="edit"> Bearbeiten</span></a>
+				<a href="settings.html"> <button> <span class="edit" data-icon="settings"></span></button> </a>
+			</menu>
+			<h1>Start & Ziel</h1>
+		</header>
+     <section id="left">
+        <header id="start"> <span class="list" >Start</span> </header>
+	<div id="wrapperleft">
+    <ul id="scrolllist">
+    <a href="#"><li><span data-icon="location"></span> <p> Cafe </p></li></a>
+    <a href="#"><li><span data-icon="airplane"></span> <p> Flughafen </p></li></a>
+    <a href="#"><li><span data-icon="headphones"></span> <p> Studio </p></li></a>
+    <a href="#"><li><span data-icon="hspa"></span> <p> Haltestelle </p></li></a>
+    <a href="#"><li><span data-icon="privacy"></span> <p> Theater </p></li></a>
+    <a href="#"><li><span data-icon="storage"></span> <p> Pizzeria </p></li></a>
+    </ul>
+</div>
+      </section>
+      <section id="right" >
+        <header id="ziel"><span class="list"> Ziel</span> </header>
+        <div id="wrapperright">
+    <ul>
+    <a href="#"><li><span data-icon="location"></span> <p> Cafe </p></li></a>
+    <a href="#"><li><span data-icon="airplane"></span> <p> Flughafen </p></li></a>
+    <a href="#"><li><span data-icon="headphones"></span> <p> Studio </p></li></a>
+    <a href="#"><li><span data-icon="hspa"></span> <p> Haltestelle </p></li></a>
+    <a href="#"><li><span data-icon="privacy"></span> <p> Theater </p></li></a>
+    <a href="#"><li><span data-icon="storage"></span> <p> Pizzeria </p></li></a>
+    </ul>
+</div>
+      </section>  
+	<section>
+	 <div id="add" >
+       <div>
+         <a href="add_location.html" data-icon="add">
+         </a>
+       </div>
+     </div>
+	 </section>
+  <div id="navigation">
+			<ul role="tablist" class="bb-tablist skin-dark">
+     			<li id="panel1" role="presentation">
+        			<a id="tab1" href="startziel.html" role="tab" aria-controls="tabpanel1" aria-selected="true" data-icon="undo">Back</a>
+        			<div id="tabpanel1" class="bb-tabpanel" role="tabpanel" aria-labelledby="tab1"></div>
+      			</li>
+      			<li id="panel2" role="presentation">
+        			<a id="tab2" href="map.html" role="tab" aria-controls="tabpanel2" aria-selected="false"data-icon="location"></a>
+       		 		<div id="tabpanel2" class="bb-tabpanel" role="tabpanel" aria-labelledby="tab2"></div>
+      			</li>
+      			<li id="panel3" role="presentation">
+        			<a id="tabDate" href="termin.html" role="tab" aria-controls="tabpanel3" aria-selected="false" data-icon="self-timer"></a>
+       		 		<div id="tabpanel3" class="bb-tabpanel" role="tabpanel" aria-labelledby="tab3"></div>
+      			</li>
+    		</ul>
+		</div>
+ </body>
+</html>
+
