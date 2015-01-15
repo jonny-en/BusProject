@@ -1,9 +1,10 @@
-
 //GLOBALS
 var cors_api_url = 'https://cors-anywhere.herokuapp.com/';
 var overpassStops; // Speichert alle Bushaltestellen, getaggt mit name und datum
-var amountRoutes = 3; // ANZAHL DER AUSZULESENDEN ROUTEN (maximal 6)
-var terminationInterval = 1 // Anzahl der Tage bis die Daten im Storage ablaufen
+var amountRoutes = 0; // ANZAHL DER AUSGELESENEN ROUTEN (maximal 5) - Dynamisch
+var terminationInterval = 1; // Anzahl der Tage bis die Daten im Storage ablaufen
+var relevantInterval = 30; //Zeitfenster in dem Routenanfragen interessant wären in Minuten (Alle Routen innerhalb von X Minuten am Zielort ankommen)
+var onlyFastest = false; //Schnellste Anfrage da nur Erste Route angefragt wird
 
 // Löschen sobald nicht mehr in testphase
 document.getElementById('load').onclick = function(e){ //Aufruf bei ButtonClick
@@ -25,6 +26,7 @@ function getData(start, finish, date){ // Finde mit aktuellem Datum wenn date==n
         return;
       }
       loadOverpassData();
+      amountRoutes=0;
       if(date===null){
         date=new Date();
       } 
@@ -34,9 +36,9 @@ function getData(start, finish, date){ // Finde mit aktuellem Datum wenn date==n
       //Bendorf -> Uni
       //var bahnREQ = 'http://mobile.bahn.de/bin/mobil/query.exe/dox?REQ0Tariff_TravellerAge.1=35&REQ0JourneyStopsS0A=1&REQ0JourneyStopsS0G=winninger str&REQ0JourneyStopsS0ID=&REQ0JourneyStopsZ0A=1&REQ0JourneyStopsZ0G=bendorf schlosspark&REQ0JourneyStopsZ0ID=&start=Suchen&REQ0Tariff_Class=2&REQ0Tariff_TravellerReductionClass.1=0&REQ0JourneyDate=02.01.15&REQ0JourneyTime=14%3A15';
       //Variable Anfrage      
-      var bahnREQ = 'http://mobile.bahn.de/bin/mobil/query.exe/dox?REQ0Tariff_TravellerAge.1=35&REQ0JourneyStopsS0A=1&REQ0JourneyStopsS0G='+start+'&REQ0JourneyStopsS0ID=&REQ0JourneyStopsZ0A=1&REQ0JourneyStopsZ0G='+finish+'&REQ0JourneyStopsZ0ID=&start=Suchen&REQ0Tariff_Class=2&REQ0Tariff_TravellerReductionClass.1=0&REQ0JourneyDate='+date.getDate()+'.'+(date.getMonth()+1)+'.'+date.getFullYear()+'&REQ0JourneyTime='+date.getHours()+'%3A'+date.getMinutes();
+      //var bahnREQ = 'http://mobile.bahn.de/bin/mobil/query.exe/dox?REQ0Tariff_TravellerAge.1=35&REQ0JourneyStopsS0A=1&REQ0JourneyStopsS0G='+start+'&REQ0JourneyStopsS0ID=&REQ0JourneyStopsZ0A=1&REQ0JourneyStopsZ0G='+finish+'&REQ0JourneyStopsZ0ID=&start=Suchen&REQ0Tariff_Class=2&REQ0Tariff_TravellerReductionClass.1=0&REQ0JourneyDate='+date.getDate()+'.'+(date.getMonth()+1)+'.'+date.getFullYear()+'&REQ0JourneyTime='+date.getHours()+'%3A'+date.getMinutes();
       //Date Test
-      //var bahnREQ = 'http://mobile.bahn.de/bin/mobil/query.exe/dox?REQ0Tariff_TravellerAge.1=35&REQ0JourneyStopsS0A=1&REQ0JourneyStopsS0G=winninger str&REQ0JourneyStopsS0ID=&REQ0JourneyStopsZ0A=1&REQ0JourneyStopsZ0G=bendorf schlosspark&REQ0JourneyStopsZ0ID=&start=Suchen&REQ0Tariff_Class=2&REQ0Tariff_TravellerReductionClass.1=0&REQ0JourneyDate='+date.getDate()+'.'+(date.getMonth()+1)+'.'+date.getFullYear()+'&REQ0JourneyTime='+date.getHours()+'%3A'+(date.getMinutes()+1);
+      var bahnREQ = 'http://mobile.bahn.de/bin/mobil/query.exe/dox?REQ0Tariff_TravellerAge.1=35&REQ0JourneyStopsS0A=1&REQ0JourneyStopsS0G=winninger str Koblenz&REQ0JourneyStopsS0ID=&REQ0JourneyStopsZ0A=1&REQ0JourneyStopsZ0G=bendorf schlosspark&REQ0JourneyStopsZ0ID=&start=Suchen&REQ0Tariff_Class=2&REQ0Tariff_TravellerReductionClass.1=0&REQ0JourneyDate='+date.getDate()+'.'+(date.getMonth()+1)+'.'+date.getFullYear()+'&REQ0JourneyTime='+date.getHours()+'%3A'+(date.getMinutes()+1);
       
       console.log(bahnREQ);
       doCORSRequestRoute({
@@ -91,13 +93,36 @@ function requestLinks(result){
           localStorage.removeItem("route"+n);
         }
 
-        for (var i=0; i<amountRoutes;i++){// Links in der Routen aus Tabelle lesen (die ersten i)                                  
-            console.log("\n"+ html.getElementsByClassName('timelink').item(i).firstChild.href + "\n\n");//Log Link URL
-            doCORSRequestData({ //Requests für Links
-                method: 'GET',
-                url: html.getElementsByClassName('timelink').item(i).firstChild.href,
-                data: null
-            });
+        for (var i=0; i<5;i++){// Links in der Routen aus Tabelle lesen
+            var times=html.getElementsByClassName('timelink').item(i).firstChild.innerHTML.split("<br>");// times[0]=startzeit; times[1]=zielzeit
+            var fastestArrival;
+            if (i==0){
+              fastestArrival = times[1]; //Schnellste Ankunftszeit 
+              console.log("\n"+ html.getElementsByClassName('timelink').item(i).firstChild.href + "\n\n");//Log Link URL
+                  doCORSRequestData({ //Requests für Links
+                  method: 'GET',
+                  url: html.getElementsByClassName('timelink').item(i).firstChild.href,
+                  data: null
+              });
+              if (onlyFastest){
+                amountRoutes=i;
+                break;
+              }
+            } else{
+              if (isRelevant(fastestArrival,times[1])){
+                  console.log("\n"+ html.getElementsByClassName('timelink').item(i).firstChild.href + "\n\n");//Log Link URL
+                  doCORSRequestData({ //Requests für Links
+                  method: 'GET',
+                  url: html.getElementsByClassName('timelink').item(i).firstChild.href,
+                  data: null
+                  });
+              } else{
+                amountRoutes=i;
+                break;
+              }
+            }
+
+            
 
         };
         
@@ -110,6 +135,32 @@ function doCORSRequestData(options) { //async Request
   x.onload = x.onerror = function(){
     htmlToData(x.responseText);};
   x.send(options.data);
+}
+
+function isRelevant(fastestTime,compareTime){ //Format der Zeiten HH:MM
+  fastestTimeSplit=fastestTime.split(":");
+  compareTimeSplit=compareTime.split(":");
+  resultSplit=[0,0];
+  resultSplit[0]=compareTimeSplit[0]-fastestTimeSplit[0];
+  resultSplit[1]=compareTimeSplit[1]-fastestTimeSplit[1];
+  //console.log(resultSplit[0]+":"+resultSplit[1]);
+  if(resultSplit[1]<0){
+    resultSplit[0]--;
+    resultSplit[1]+=60;
+  } else if(resultSplit[1]>60){
+    resultSplit[0]++;
+    resultSplit[1]-=60;
+  }
+  if (resultSplit[0]>23){
+    resultSplit[0]-=24
+  } else if (resultSplit[0]<0){
+    resultSplit[0]+=24
+  }
+  console.log(resultSplit[0]+":"+resultSplit[1]);
+  if ((resultSplit[0]===0) && (resultSplit[1]<=relevantInterval)){
+    return true;
+  }
+  return false;
 }
 
 
@@ -215,7 +266,7 @@ function buildRouteObject(busNr,stops,times,routesObject){
 //Helper
 function filterDistricts(stopName){
 
-      //console.log("TEST: " + stopName+"\n");
+      //console.log("Start Filtering: " + stopName+"\n");
       var ret = stopName;
       var lowerCaseStop = stopName.toLowerCase();
 
@@ -226,18 +277,18 @@ function filterDistricts(stopName){
         if (lowerCaseStop.indexOf(stadtteile[n] + " ") === 0){
           ret= trim(stopName.replace(stopName.substr(0,stadtteile[n].length),"")); //Streiche Stadteil
           //console.log("HIT (1): "+stadtteile[n] +"\n");
-          //console.log(stopName + "->" + ret +"\n");
+          //console.log("Finished:"+ stopName + "->" + ret +"\n");
           return ret;
         } else if(lowerCaseStop.indexOf("-" + stadtteile[n]) > -1){
           ret= trim(stopName.replace(stopName.substr(lowerCaseStop.indexOf("-" + stadtteile[n]),("-"+stadtteile[n]).length),"")); //Streiche Stadteil
           //console.log("HIT (2): "+stadtteile[n] +"\n");
-          //console.log(stopName + "->" + ret+"\n");
+          //console.log("Finished:"+ stopName + "->" + ret+"\n");
           return ret;
         }
 
       }
       //console.log("NOHIT"+"\n");
-      //console.log(stopName + "->" + ret+"\n");
+      //console.log("Finished:"+ stopName + "->" + ret+"\n");
       return ret;
 }
 
@@ -322,14 +373,16 @@ function getLongLat(stopNames, townNames){ //Läd wenn notwendig Koordinaten von
   //console.log("StopQuery: " + stopQuery+"\n");
   var index = overpassStopsContainsName(townQuery);
   //console.log("Index in Stored Data: "+index + "\n");
-
   if(index > -1){ //Schon gespeichert?
     var elements=overpassStops[index].elements;  
   } else {  // Lade
-    //console.log("Initially load: "+townQuery);
+    console.log("Initially load: "+townQuery);
+    var checkVar = false;
     var x = new XMLHttpRequest();
-    x.open('GET', query, false); //sync Request -> Daten direkt nutzbar (dafür wartet alles auf resonse) <- sollte verbessert werden
+    x.open('GET', query,false); //sync Request -> Daten direkt nutzbar (dafür wartet alles auf resonse) <- sollte verbessert werden
     x.send(null);
+    console.log("Finished loading");
+
     var obj = JSON.parse(x.responseText);
     var elements = obj.elements;
     var termination= new Date();
