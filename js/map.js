@@ -1,11 +1,25 @@
 
-var pos = [50.356696, 7.599617];
+window.onload = function(){
 
 var map = L.map('map');
 
-		L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png ', {
-			maxZoom: 18
-		}).addTo(map);
+	L.tileLayer('http://otile1.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {
+		maxZoom: 18,
+		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ',
+		id: 'examples.map-i875mjb7'
+	}).addTo(map);
 
 
-		map.setView(pos,15,true);
+	function onLocationFound(e){
+		var radius = e.accuracy/2;
+		L.marker(e.latlng).addTo(map);
+		L.circle(e.latlng, radius).addTo(map);
+		
+	};
+
+
+
+	map.on("locationfound", onLocationFound);
+	map.locate({setView: true, maxZoom: 16});
+
+};
