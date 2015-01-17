@@ -1,10 +1,39 @@
-//GLOBALS
-var cors_api_url = 'https://cors-anywhere.herokuapp.com/';
-var overpassStops; // Speichert alle Bushaltestellen, getaggt mit name und datum
-var amountRoutes = 0; // ANZAHL DER AUSGELESENEN ROUTEN (maximal 5) - Dynamisch
+//GLOBALS (die manuell angepasst werden können)
 var terminationInterval = 1; // Anzahl der Tage bis die Daten im Storage ablaufen
 var relevantInterval = 30; //Zeitfenster in dem Routenanfragen interessant wären in Minuten (Alle Routen innerhalb von X Minuten am Zielort ankommen)
 var onlyFastest = false; //Schnellste Anfrage da nur Erste Route angefragt wird
+
+//GLOBAL (private)
+var cors_api_url = 'https://cors-anywhere.herokuapp.com/';
+var overpassStops; // Speichert alle Bushaltestellen, getaggt mit name und datum
+var overpassRoutes; // Analog mit Routen
+
+var routeNumber = 0; //Zähler für schreiben der Routen
+
+
+var DataObserver=function (){ //Singleton um sicherzustellen das alle denselben Wert benutzen
+    if ( arguments.callee._singletonInstance ){
+      return arguments.callee._singletonInstance;
+    }
+    arguments.callee._singletonInstance = this;
+
+    DataObserver.prototype.activeProcess=0;
+    DataObserver.prototype.addProcess= function(){
+      this.activeProcess++;
+    }
+    DataObserver.prototype.removeProcess= function(){
+      if (this.activeProcess===0){
+        console.log("pls add active processes first")
+        return;
+      }
+      this.activeProcess--;
+      if (this.activeProcess===0){
+        console.log("Start processData");
+        processData();
+      }
+    }
+}
+var tracker = new DataObserver(); //Erstelle Instanz bzw init Singleton
 
 // Löschen sobald nicht mehr in testphase
 document.getElementById('load').onclick = function(e){ //Aufruf bei ButtonClick
@@ -26,7 +55,7 @@ function getData(start, finish, date){ // Finde mit aktuellem Datum wenn date==n
         return;
       }
       loadOverpassData();
-      amountRoutes=0;
+      routeNumber=0;
       if(date===null){
         date=new Date();
       } 
@@ -58,21 +87,51 @@ function doCORSRequestRoute(options) { //async Request
 }
 
 function loadOverpassData(){ //Läd nur Stops, da Routen nicht zur Verarbeitung gebraucht werden (werden nur gespeichert)
-  var temp = localStorage.getItem("overpass_stops");
-  if (temp === null){
-    overpassStops=[];
-  } else{
-    overpassStops=JSON.parse(temp);
-    for (var i=0; i<overpassStops.length; i++){
-      var now = new Date();
-      var termination= new Date(overpassStops[i].date);
-      if(termination<now){
-        //console.log("Removing Position: " + i);
-        overpassStops.splice(i,1); //Löschen der Alten Version
-        i--;
+  localforage.getItem("overpass_stops",function(err, value){
+    if (err){
+      console.log ("Couldnt get overpass_stops");
+    } else{
+      if (value === null){
+      overpassStops=[];
+    } else{
+      overpassStops=value;
+      for (var i=0; i<overpassStops.length; i++){
+        var now = new Date();
+        var termination= new Date(overpassStops[i].date);
+        if(termination<now){
+          //console.log("Removing Position: " + i);
+          overpassStops.splice(i,1); //Löschen der Alten Version
+          i--;
+          }
+        }
       }
     }
+  });
+  
+
+  localforage.getItem("overpass_routes",function(err, value){
+    if (err){
+      console.log ("Couldnt get overpass_routes");
+    } else{
+      if (value === null){
+          overpassRoutes=[];
+        } else{
+          overpassRoutes=value;
+          for (var n=0; n<overpassRoutes.length; n++){
+            var now = new Date();
+            var termination= new Date(overpassRoutes[n].date);
+            if(termination<now){
+              //console.log("Removing Position: " + n);
+              overpassRoutes.splice(n,1); //Löschen der Alten Version
+              n--;
+            }
+          }
+        }
+
+    }
+
   }
+  );
 }
 
 
@@ -89,8 +148,9 @@ function requestLinks(result){
         var parser=new DOMParser();
         var html = parser.parseFromString(result,"text/html");
 
-        for (var n=0; n<6; n++){ //clear localStorage routes
-          localStorage.removeItem("route"+n);
+        for (var n=0; n<6; n++){ //clear localforage routes
+          var routeKey="route"+n;
+          localforage.removeItem(routeKey,function(err){});
         }
 
         for (var i=0; i<5;i++){// Links in der Routen aus Tabelle lesen
@@ -98,26 +158,26 @@ function requestLinks(result){
             var fastestArrival;
             if (i==0){
               fastestArrival = times[1]; //Schnellste Ankunftszeit 
-              console.log("\n"+ html.getElementsByClassName('timelink').item(i).firstChild.href + "\n\n");//Log Link URL
+              tracker.addProcess();
+              console.log("Request: "+ html.getElementsByClassName('timelink').item(i).firstChild.href + "\n\n");//Log Link URL
                   doCORSRequestData({ //Requests für Links
                   method: 'GET',
                   url: html.getElementsByClassName('timelink').item(i).firstChild.href,
                   data: null
               });
               if (onlyFastest){
-                amountRoutes=i;
                 break;
               }
             } else{
               if (isRelevant(fastestArrival,times[1])){
-                  console.log("\n"+ html.getElementsByClassName('timelink').item(i).firstChild.href + "\n\n");//Log Link URL
+                  tracker.addProcess();
+                  console.log("Request: "+ html.getElementsByClassName('timelink').item(i).firstChild.href + "\n\n");//Log Link URL
                   doCORSRequestData({ //Requests für Links
                   method: 'GET',
                   url: html.getElementsByClassName('timelink').item(i).firstChild.href,
                   data: null
                   });
               } else{
-                amountRoutes=i;
                 break;
               }
             }
@@ -156,7 +216,7 @@ function isRelevant(fastestTime,compareTime){ //Format der Zeiten HH:MM
   } else if (resultSplit[0]<0){
     resultSplit[0]+=24
   }
-  console.log(resultSplit[0]+":"+resultSplit[1]);
+  console.log(compareTime+" - "+fastestTime+" = "+resultSplit[0]+":"+resultSplit[1]);
   if ((resultSplit[0]===0) && (resultSplit[1]<=relevantInterval)){
     return true;
   }
@@ -185,18 +245,12 @@ function htmlToData(resultLinks){
 
   buildRouteObject(busNr,stops,times,routesObject);
 
-  for (var n=0; n<6; n++){ //Speichern der Route in localStorage
-      if (localStorage.getItem("route"+n)===null){
-
-          console.log("route"+n+" : "+JSON.stringify(routesObject) + "\n\n"); //JSON Object log
-          localStorage.setItem("route"+n,JSON.stringify(routesObject));
-          if ((n+1)==amountRoutes){
-            console.log("LOADING ALL ROUTES COMPLETED - DO STUFF WITH DATA\n");
-            processData();
-          }
-          break;
-        }
-  }
+  console.log("route"+routeNumber+" : "+JSON.stringify(routesObject) + "\n\n"); //JSON Object log
+  localforage.setItem("route"+routeNumber,routesObject,function(err){
+    tracker.removeProcess();
+  });
+  routeNumber++;
+  
   
   
 }
@@ -240,19 +294,16 @@ function buildRouteObject(busNr,stops,times,routesObject){
   var coordinatesContainer=[];
   for (var i=0; i<busNr.length;i++){
     
-    if(i==0){ 
-      var filteredStop= filterDistricts(stops[i]);
-      var townNames = getTownNames(filteredStop); //Mögliche TownNamen für Overpass-Query
-      var stopNames = getStopNames(filteredStop,townNames); //Mögliche StopNamen für Overpass-Query
-      coordinatesContainer[1] = getLongLat(stopNames,townNames);
-    }
+    var filteredStop0= filterDistricts(stops[i]);
+    var townNames0 = getTownNames(filteredStop0); //Mögliche TownNamen für Overpass-Query
+    var stopNames0 = getStopNames(filteredStop0,townNames0); //Mögliche StopNamen für Overpass-Query
+    coordinatesContainer[0] = getLongLat(stopNames0,townNames0,busNr[i]);
 
-    coordinatesContainer[0] = coordinatesContainer[1]; //verschiebe nach alte Daten
-    var filteredStop= filterDistricts(stops[i+1]);
-    var townNames = getTownNames(filteredStop); //Mögliche TownNamen für Overpass-Query
-    var stopNames = getStopNames(filteredStop,townNames); 
+    var filteredStop1= filterDistricts(stops[i+1]);
+    var townNames1 = getTownNames(filteredStop1); //Mögliche TownNamen für Overpass-Query
+    var stopNames1 = getStopNames(filteredStop1,townNames1); 
+    coordinatesContainer[1] = getLongLat(stopNames1,townNames1,busNr[i]);
 
-    coordinatesContainer[1] = getLongLat(stopNames,townNames); // <---- müssen wahrscheinlich auch noch gefiltert werden sonst z.B Winninger Str. = 3 Koordinaten
 
     if(i==0){
       routesObject.route.push(buildJsonSection(busNr[0],stops[0],stops[1],times[0],times[1],coordinatesContainer[0],coordinatesContainer[1]));
@@ -264,6 +315,8 @@ function buildRouteObject(busNr,stops,times,routesObject){
 }
 
 //Helper
+
+
 function filterDistricts(stopName){
 
       //console.log("Start Filtering: " + stopName+"\n");
@@ -353,8 +406,10 @@ function getStopNames(stopName, townNames){
 
 //Schritt 3.1c: Finde Koordinaten bei Overpass
 
-function getLongLat(stopNames, townNames){ //Läd wenn notwendig Koordinaten von Overpass
-
+function getLongLat(stopNames, townNames, routeNr){ //Läd wenn notwendig Koordinaten von Overpass
+  if ((routeNr ==="Fußweg") || (routeNr.indexOf("RB")>-1) || (routeNr.indexOf("RE")>-1) || (routeNr.indexOf("IC")>-1 || (routeNr.indexOf("ICE")>-1))){
+    return [];
+  }
   var townQuery=townNames[0]; 
   for (var t=1; t<townNames.length;t++){
     if (townNames[t] != ""){
@@ -376,12 +431,12 @@ function getLongLat(stopNames, townNames){ //Läd wenn notwendig Koordinaten von
   if(index > -1){ //Schon gespeichert?
     var elements=overpassStops[index].elements;  
   } else {  // Lade
-    console.log("Initially load: "+townQuery);
+    //console.log("Initially load: "+townQuery);
     var checkVar = false;
     var x = new XMLHttpRequest();
     x.open('GET', query,false); //sync Request -> Daten direkt nutzbar (dafür wartet alles auf resonse) <- sollte verbessert werden
     x.send(null);
-    console.log("Finished loading");
+    //console.log("Finished loading");
 
     var obj = JSON.parse(x.responseText);
     var elements = obj.elements;
@@ -390,30 +445,59 @@ function getLongLat(stopNames, townNames){ //Läd wenn notwendig Koordinaten von
     storeInOverpassData(townQuery, termination.toDateString(), elements);
   }
 
-  var coordinatesList =  buildCoordinatesList(elements,stopNames);
+  var coordinatesList =  buildCoordinatesList(elements,stopNames,townQuery,routeNr);
   return coordinatesList;
 }
 
 //Helper
 
-function buildCoordinatesList(elements,stopNames){
+function buildCoordinatesList(elements,stopNames,townName,routeNr){
   var coordinatesList = []; //Hole nur Koordinaten
+  var route=null;
+  loop:
+  for (var k=0;k<overpassRoutes.length;k++){
+    if (overpassRoutes[k].town===townName){
+      
+      var townRoutes=overpassRoutes[k].elements; // Finde alle Routen
+      for (var l=0; l<townRoutes.length; l++){
+        //console.log(JSON.stringify(townRoutes[l].tags));
+        if (townRoutes[l].tags.ref===routeNr){
+          route=townRoutes[l];   
+          break loop;
+        }
+        
+      }
+      console.log("Busline not found: "+routeNr+ " in " + townName); // auf Linien wie 3/13 anpassen
+    }
+  }
+
   for (var i=0; i<elements.length;i++){ 
     if(elements[i].tags !=null){
       if (elements[i].tags.name != null){ // Bricht sonst ohne Fehlermeldung ab
         if(elements[i].tags.name.indexOf(stopNames[0]) > -1){   // TEST AUF NUR ERSTE WAHL STOP NAME (MUSS BEI MEHR ALTERNATIVEN GEFIXED WERDEN)
           if ((elements[i].lon != null) && (elements[i].lat != null)){
-            var coordinates=new Object();
-                    coordinates.lon=elements[i].lon;
-                    coordinates.lat=elements[i].lat;
-                    //console.log(stopNames[0]+" -> "+elements[i].tags.name+ "\n");
-                    coordinatesList.push(coordinates);
-          }
-          
+              if (route==null){ // Keine passenede Route -> nimm alle Koordinaten
+                var coordinates=new Object();
+                coordinates.lon=elements[i].lon;
+                coordinates.lat=elements[i].lat;
+                //console.log(stopNames[0]+" -> "+elements[i].tags.name+ "\n");
+                coordinatesList.push(coordinates);
+              } else{ //Ansonsten filtere
+                    for (var n=0; n<route.members.length; n++){
+                      if (route.members[n].ref===elements[i].id){
+                        var coordinates=new Object();
+                        coordinates.lon=elements[i].lon;
+                        coordinates.lat=elements[i].lat;
+                        //console.log(stopNames[0]+" -> "+elements[i].tags.name+ "\n");
+                        coordinatesList.push(coordinates);
+                      }
+                    }
+                }
+              }       
+          }       
         }
       }
     }
-  }
   return coordinatesList;
 }
 
@@ -434,17 +518,13 @@ function overpassStopsContainsName(town){ //returns Index
 //Wenn nicht in gespeicherten Dateien, speichere
 function storeInOverpassData(town, date, elements){
       
-      var overpassRoutes = localStorage.getItem("overpass_routes");
-      
       var storeRoutes = false;
       var storeStops = false;
 
-      if (overpassRoutes === null){
-        overpassRoutes=[];
+      if (overpassRoutes.length === 0){
         storeRoutes=true;
         //console.log("AllOWED TO STORE ROUTE (Initial): "+town); 
       } else {
-        overpassRoutes=JSON.parse(overpassRoutes);
         for (var i=0; i<overpassRoutes.length;i++){
           if (overpassRoutes[i].town != null){ // Bricht sonst ohne Fehlermeldung ab
             if(overpassRoutes[i].town.indexOf(town) != 0){   // Test ob Routen der Stadt schon gespeichert
@@ -493,7 +573,9 @@ function storeInOverpassData(town, date, elements){
         obj1.elements=stops;
 
         overpassStops.push(obj1);
-        localStorage.setItem("overpass_stops",JSON.stringify(overpassStops));
+        localforage.setItem("overpass_stops",overpassStops,function(err){
+          console.log("overpass_stops stored");
+        });
 
         var obj2 = new Object();
         obj2.town=town;
@@ -501,7 +583,9 @@ function storeInOverpassData(town, date, elements){
 
         obj2.elements=routes;
         overpassRoutes.push(obj2);
-        localStorage.setItem("overpass_routes",JSON.stringify(overpassRoutes));
+        localforage.setItem("overpass_routes",overpassRoutes,function(err){
+          console.log("overpass_routes stored");
+        });
       } 
       else if (!storeStops && storeRoutes){ //Nur Routes
         //console.log("Trying to store routes");
@@ -515,7 +599,9 @@ function storeInOverpassData(town, date, elements){
         obj.date=date;
         obj.elements=routes;
         overpassRoutes.push(obj);
-        localStorage.setItem("overpass_routes",JSON.stringify(overpassRoutes));
+        localforage.setItem("overpass_routes",overpassRoutes,function(err){
+          console.log("overpass_routes stored");
+        });
       }
       else if (storeStops && !storeRoutes){// Nur Stops
         //console.log("Trying to store stops");
@@ -531,7 +617,9 @@ function storeInOverpassData(town, date, elements){
         obj.date=date;
         obj.elements=stops;
         overpassStops.push(obj);
-        localStorage.setItem("overpass_stops",JSON.stringify(overpassStops));
+        localforage.setItem("overpass_stops",overpassStops,function(err){
+          console.log("overpass_stops stored");
+        });
       } 
       
   }
