@@ -24,4 +24,10 @@
 
     });
 
+   
     <!-- END Script for ColorChange -->
+        
+     $("#add").click(function() {
+  window.location = "add_location.html"; 
+  return false;
+});
