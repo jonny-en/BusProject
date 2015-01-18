@@ -23,7 +23,14 @@ body {
 	bottom: 45px;
 	position: fixed;
 	margin: 0;
+	display: none;
 
+
+}
+
+.slideActive {
+	bottom: 45px;
+	transition: 1s;
 }
 
 
