@@ -23,12 +23,13 @@ header menu {
 }
 header menu a, header menu a:visited {
     color: white;
-    line-height: 18px;
-    margin-left: 15px;
+    line-height: 25px;
     float: left;
     text-decoration: none;
     font-size: 12px;
+    padding-left: 10px;
 }
+
 header h1 {
     color: white;
     line-height: 18px;
