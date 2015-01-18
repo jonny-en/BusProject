@@ -16,6 +16,16 @@ body {
 	height: 100%;
 }
 
+#slideup {
+	background-color: black;
+	height: 200px;
+	width: 100%;
+	bottom: 45px;
+	position: fixed;
+	margin: 0;
+
+}
+
 
 #settings {
 	position: absolute;
