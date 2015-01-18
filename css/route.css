@@ -71,4 +71,5 @@ header {
     height: 50px;
     background: url('../img/icons/route/add.png') rgba(122, 201, 89, 0.6) center 7px no-repeat;
     text-align: center;
+    cursor: pointer;
 }
