@@ -1,56 +1,143 @@
-<!DOCTYPE HTML> 
-<html>
-  <head>
-    <link rel="stylesheet" href="css/tabs.css" />
-    <link rel="stylesheet" href="css/headers.css" />
-    <link rel="stylesheet" href="css/gaia-icons-embedded.css" />
-    <link rel="stylesheet" href="css/lists.css" />
-    <link rel="stylesheet" href="css/index.css" />
-  </head>
-  <body>
-   <div class="view">
-    <div id="header">
-     <section class="skin-dark" role="region">
-      <header>
-       <menu type="toolbar">
-         <a id="editbutton" href="edit_location.html">Bearbeiten</a>
-         <menuseperator />
-         <a id="settingsbutton" data-icon="settings" href="settings.html"></a>
-       </menu>
-       <h1>Start & Ziel</h1>
-      </header>
-     </section>
-     </div>
-     <div id="startoptions">
-       <ul>
-         <li>
-         </li>
-       </ul>
-     </div>
-     <div id="destinationoptions">
-     </div>
-     <div id="add" >
-       <div>
-         <a href="add_location.html" data-icon="add">
-         </a>
-       </div>
-     </div>
-      <div id="navigation">
-			<ul role="tablist" class="bb-tablist skin-dark">
-     			<li id="panel1" role="presentation">
-        			<a id="tab1" href="index.html" role="tab" aria-controls="tabpanel1" aria-selected="true" data-icon="undo">Back</a>
-        			<div id="tabpanel1" class="bb-tabpanel" role="tabpanel" aria-labelledby="tab1"></div>
-      			</li>
-      			<li id="panel2" role="presentation">
-        			<a id="tab2" href="map.html" role="tab" aria-controls="tabpanel2" aria-selected="false">Map</a>
-       		 		<div id="tabpanel2" class="bb-tabpanel" role="tabpanel" aria-labelledby="tab2"></div>
-      			</li>
-      			<li id="panel3" role="presentation">
-        			<a id="tabDate" href="termin.html" role="tab" aria-controls="tabpanel3">Date</a>
-       		 		<div id="tabpanel3" class="bb-tabpanel" role="tabpanel" aria-labelledby="tab3" aria-selected="false"></div>
-      			</li>
-    		</ul>
-		</div>
-    </div>
-  </body>
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <meta charset="utf-8">
+    <title>BusProject</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/route.css">
+    <link href='http://fonts.googleapis.com/css?family=Fira+Sans' rel='stylesheet' type='text/css'>
+    <script src="script.js"></script>
+</head>
+
+<body>
+
+
+    <!-- Start Content-->
+
+        <section role="region">
+
+            <header>
+                <menu type="toolbar">
+                    <a href="edit_location.html"><span>Bearbeiten</span></a>
+                    <a href="settings.html"><img src="img/icons/settings.png" /></a>
+                </menu><h1>Start & Ziel</h1>
+            </header>
+
+            <div class="clearboth"></div>
+        </section>
+	
+	    <div id="content">
+
+            <!-- START list of favs - left side -->
+            <ul class="fav-list" id="fav-left">
+                <li>
+                    <button>
+                        <img src="img/icons/favs/heart.svg" />
+                    </button>
+                    <h3>Freundin</h3>
+                </li>
+
+                <li>
+                    <button>
+                        <img src="img/icons/favs/heart.svg" />
+                    </button>
+                    <h3>Freundin</h3>
+                </li>
+                <li>
+                    <button>
+                        <img src="img/icons/favs/heart.svg" />
+                    </button>
+                    <h3>Freundin</h3>
+                </li>
+				<li>
+                    <button>
+                        <img src="img/icons/favs/heart.svg" />
+                    </button>
+                    <h3>Freundin</h3>
+                </li>
+                <li>
+                    <button>
+                        <img src="img/icons/favs/heart.svg" />
+                    </button>
+                    <h3>Freundin</h3>
+                </li>
+                <li>
+                    <button>
+                        <img src="img/icons/favs/heart.svg" />
+                    </button>
+                    <h3>Freundin</h3>
+                </li>
+            </ul>
+            <!--  //END list of favs - left side -->
+
+			<div class="fav-separator"></div>
+
+            <!-- START list of favs - right side -->
+            <ul class="fav-list" id="fav-right">
+                <li>
+                    <button>
+                        <img class="svg" src="img/icons/favs/heart.svg" />
+                    </button>
+                    <h3>Freundin</h3>
+                </li>
+
+                <li>
+                    <button>
+                        <img class="svg" src="img/icons/favs/heart.svg" />
+                    </button>
+                    <h3>Freundin</h3>
+                </li>
+
+                <li>
+                    <button>
+                        <img class="svg" src="img/icons/favs/heart.svg" />
+                    </button>
+                    <h3>Freundin</h3>
+                </li>
+            </ul>
+            <!--  //END list of favs - right side -->
+
+            <!-- clear floats -->
+            <div class="clearboth">
+            </div>
+			
+			
+        </div>
+        <!-- //END Content -->
+
+		<div id="add" onclick="location.href='#';" style="cursor: pointer;"></div>
+
+
+        <!-- Navigation - This should be in all your views -->
+        <div id="navigation">
+            <ul role="tablist">
+                <li id="panel1" role="presentation" aria-selected="true">
+                    <a id="tab1" href="index.html" role="tab" aria-controls="tabpanel1">
+                        <img src="img/icons/navi/route.png" />
+                    </a>
+                    <div id="tabpanel1" role="tabpanel" aria-labelledby="tab1"></div>
+                
+                </li><li id="panel2" role="presentation" aria-selected="false">
+                    <a id="tab2" href="map.html" role="tab" aria-controls="tabpanel2">
+                        <img src="img/icons/navi/map.png" />
+                    </a>
+                    <div id="tabpanel2" class="bb-tabpanel" role="tabpanel" aria-labelledby="tab2"></div>
+                
+                </li><li id="panel3" role="presentation" aria-selected="false">
+                    <a id="tabDate" href="termin.html" role="tab" aria-controls="tabpanel3">
+                        <img src="img/icons/navi/clock.png" />
+                        <div id="tabpanel3" role="tabpanel" aria-labelledby="tab3"></div>
+              	</li>
+            </ul>
+        </div>
+        <!-- //END Navigation -->
+
+    
+	<!-- Load Scripts for this special site -->
+	<script src="js/route.js"></script>
+
+</body>
+
 </html>
