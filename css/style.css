@@ -69,12 +69,14 @@ header h1 {
     display: inline-block;
     background: rgba(0, 0, 0, 0.7);
 }
+#navigation li {
+    cursor: pointer;
+}
+
 #navigation li[aria-selected="true"] {
     background-color: #249ab4;
 }
-#navigation li:hover, #navigation li:active {
-    background-color: #249ab4;
-}
+
 #navigation li .active {
     background-color: #249ab4;
 }
