@@ -1,0 +1,75 @@
+body {
+    background: url('../img/bg.png');
+}
+header {
+    background: url('../img/bg.png');
+     border-bottom: solid rgba(255, 255, 255, 0.3) 1px;
+    -webkit-box-shadow: 0px 3px 5px -1px rgba(0, 0, 0, 0.3);
+    -moz-box-shadow: 0px 3px 5px -1px rgba(0, 0, 0, 0.3);
+    box-shadow: 0px 3px 5px -1px rgba(0, 0, 0, 0.3);
+}
+
+#content {
+    display: table;
+    table-layout: fixed;
+}
+
+.fav-list {
+    list-style: none;
+    display: table-cell;
+    width: 49.7%;
+    margin: 0 auto;
+    padding: 70px 0 0 0;
+    text-align: center;
+}
+#fav-left {
+    background: url('../img/icons/route/departure.png') no-repeat;
+    background-position: center 60px;
+}
+#fav-right {
+    background: url('../img/icons/route/arrival.png') no-repeat;
+    background-position: center 60px;
+}
+.fav-list li {
+    margin: 10px 0px;
+}
+.fav-list h3 {
+    color: white;
+    font-weight: normal;
+    font-size: 12px;
+    margin: 8px 0 0 0;
+    text-transform: uppercase;
+}
+.fav-list button {
+    border-radius: 50%;
+    width: 72px;
+    height: 72px;
+    background: white;
+    border: none;
+    outline: none;
+}
+.fav-list .clicked {
+    background: #7ac858;
+}
+.fav-list button img {
+    width: 40px;
+    height: 40px;
+    margin-top: 9px;
+}
+.fav-separator {
+    display: table-cell;
+    background: url('../img/icons/route/fav-separator.png');
+    opacity: 0.3;
+    z-index: 0;
+    height: 60px;
+    width: 2px;
+}
+#add {
+    position: fixed;
+    bottom: 45px;
+    width: 100%;
+    height: 50px;
+    background: url('../img/icons/route/add.png') rgba(122, 201, 89, 0.6) center 7px no-repeat;
+    text-align: center;
+    cursor: pointer;
+}
