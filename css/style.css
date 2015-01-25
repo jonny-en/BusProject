@@ -32,11 +32,10 @@ header menu a, header menu a:visited {
 
 header h1 {
     color: white;
-    line-height: 22px;
+    line-height: 18px;
     font-weight: normal;
     margin-left: 30px;
     float: left;
-    font-size: 22px;
 
 }
 /* End Header */
@@ -82,3 +81,8 @@ header h1 {
     background-color: #249ab4;
 }
 /* End Navigation */
+
+.view{
+    height: 100%;
+    background-color: red;
+}
