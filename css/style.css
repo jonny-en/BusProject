@@ -81,3 +81,8 @@ header h1 {
     background-color: #249ab4;
 }
 /* End Navigation */
+
+.view{
+    height: 100%;
+    background-color: red;
+}
